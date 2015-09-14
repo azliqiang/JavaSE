@@ -1,0 +1,23 @@
+                                           i j
+   j                                   UP -1 0
+   01234567890123456789012345678901  DOWN  1 0
+i 0--------------------------------  LEFT  0-1
+  1|                 O            | RIGHT  0 1
+  2|        ^                     |    2,9
+  3|      <-#->                   |3,8 3,9 3,10
+  4|        #                     |    4,9
+  5|        ###                   |    5,9 5,10 5,11 
+  6|          #         O       O |             6,11
+  7|          #                   |             7,11
+  8|                              |  nodes.remove(nodes.size()-1)
+  9--------------------------------
+   class Node(i,j)         
+   class Worm(List<Node> nodes)  
+     step()
+     step(int dir)
+   class WormPanel
+   
+   
+   
+   
+   

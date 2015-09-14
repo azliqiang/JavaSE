@@ -1,0 +1,790 @@
+
+环境配置：
+   
+   1 安装 JDK 1.7 
+   2 配置环境变量
+      2.1 我的电脑->属性->高级->环境变量->系统变量中添加以下环境变量 
+      2.2 JAVA_HOME值为： D:\Program Files\Java\jdk1.6.0_18                                     
+      2.3 CLASSPATH值为：.;%JAVA_HOME%\lib\tools.jar;%JAVA_HOME%\lib\dt.jar;%JAVA_HOME%\bin; 
+      2.4 Path:           在开始追加 %JAVA_HOME%\bin; 
+   3 安装 Eclipse
+     3.01 解压adt-bundle-windows-x86_64-20140702.zip文件  
+     3.02 打开eclipse文件夹
+     3.03 运行eclipse.exe
+  
+开发工具：
+
+      开发工具:     Eclipse
+      Java jdk版本：jdk 1.7 
+      Android sdk版本： sdk 4.4.2  API:19
+     
+引入语 ：
+      1.简单的电话通讯录，可以实现拨打电话的功能。
+      2.通过本地文件读写记录联系人，也可以改用数据库保存。
+     
+
+New Project
+       01. File --> New --> Android Application Project;
+       02. Project name: FlappyBird;
+       03. Finish.
+
+ New Class
+       01. 右键 src --> New --> Class;
+       02. Name: FlappyBird;
+       03. Package: com.qianfeng.flappybird;
+       04. 选中：public static void main(String[] args);
+       05. Finish.
+
+主要步骤
+
+ 1 创建BirdGame类
+   1.01 创建GiedGame类
+   1.02 定义BirdGame类变量，在构造方法中初始化
+   1.03 创建监听事件刷新显示方法
+   1.04 main方法中创建窗体
+ 2 重写BirdGame类 paint方法,开始进行绘图
+   2.01 初始化三种状态背景图片
+   2,02 三种状态背景图片赋值
+   2.03 重写paint方法并绘制背景图片
+   2.04 paint方法中绘制开始和游戏结束页面
+   2.05 paint方法中绘制所得分数
+   2.06 paint方法中绘制所得分数阴影
+ 3 创建小鸟类  
+   3.01 创建小鸟类 并初始化数据
+   3.02 在BirdGame类中声明小鸟类对象
+   3.03 BirdGame构造方法中new对象
+   3.04 BirdGame类 paint方法中 绘制小鸟
+   3.05 绘制小鸟飞的方法fly() 并在 action方法的刷新页面循环 START 和 RUNNING 状态中调用
+ 4 创建地面类
+   4.01 创建地面类并初始化数据
+   4.02 在BirdGame类中声明地面类对象，构造方法实例对象
+   4.03 在BirdGame类 paint方法中绘制地面
+   4.04 Ground中添加地面移动方法 step() 并在action 循环刷新中调用
+   4.05 编写action方法中 鼠标点击事件
+ 5 创建柱子类
+   5.01 创建柱子类以及初始化数据
+   5.02 在BirdGame类中声明小鸟类对象，构造方法实例对象
+   5.03 在BirdGame类 paint方法中绘制柱子   
+   5.04 中添加地面移动方法 step() 并在action 循环刷新中调用
+ 6 完善Bird类和鼠标监听事件 
+   6.01 编写Bird类移动方法
+   6.02 action刷新中调用
+   6.03  编写Bird类向上飞方法
+   6.04 完善鼠标点击事件
+   6.05 添加计算分数方法
+   6.06 Bird类 添加撞击检测方法
+   6.07 在action 刷新页面中添加撞击检测   
+   6.08 给小鸟添加旋转角度
+        项目完毕
+
+7 项目注意事项
+8 项目拓展延伸
+
+ 
+
+
+具体实现
+  
+01.创建BirdGame类 
+   
+   1.01 创建BirdGame类
+      
+        /**
+         *创建BirdGame类，继承Jpanel
+         */        
+           public class BirdGame extends JPanel {
+         
+              public void main(String [] args){
+           
+       (1)       System.out.println("你好，");  //这要说一个比较有意义的名字
+            
+              }
+          }
+
+                
+
+   1.02 定义BirdGame类变量，在构造方法中初始化
+      
+         public class BirdGame extends JPanel {
+         ..... ....        
+
+             /* 游戏状态 */
+	（1）private int             state = 0 ;              //游戏状态
+	（2）public static final int START = 0;               //游戏开始常量值
+	（3）public static final int RUNNING = 1;             //游戏运行常量值
+	（4）public static final int GAME_OVER = 2;           //游戏结束常量值
+	（5）private int             score = 0;               //游戏分数
+	 
+	（6）public BirdGame() throws Exception {
+
+	（7）  	state = START;
+	（8）	score = 0;
+	     }
+
+   1.03  鼠标监听方法以及刷新显示方法     
+         
+         public BirdGame() throws Exception {....}
+                 
+         ..... ....
+    
+         public void action() throws Exception {
+	       //鼠标监听事件适配器
+        （1）  MouseListener l = new MouseAdapter() {		  
+		   // Mouse 老鼠 Pressed按下
+	（2） public void mousePressed(MouseEvent e) {		 
+			switch (state) {					
+        （3）	case GAME_OVER:
+				//游戏结束		
+				break;
+	（4）	case START:
+                                //游戏开始状态 点击以后改变成运行状态
+				state = RUNNING;
+                                break;
+
+	（5）	case RUNNING:
+                                 //运行状态
+                                break;						
+				}
+			     }
+		         };
+		
+	    //将l挂接到当前的面板（game）上
+	（6）addMouseListener(l);
+
+	 (7)   while (true) {
+	 (8)	switch (state) {
+	（9）	case START:
+			      //开始状态	
+				break;
+	（10）	case RUNNING:
+			       //运行状态
+				break;
+			}
+                         
+	（11）	repaint();                //刷新窗体
+	（12）	Thread.sleep(1000 / 60);  //休眠1000/60秒            
+                         
+		}
+	}
+  
+       互动：为什么要开启死循环刷新界面，什么是帧动画，胶卷老电影举例！
+
+   1.04 main方法中创建窗体
+         
+         public static void main(String[] args) throws Exception {
+         ..... ....         
+
+      (1)  JFrame frame = new JFrame();
+      (2)  BirdGame game = new BirdGame();
+      (3)  frame.add(game);
+      (4)  frame.setSize(440, 670);
+         //位于屏幕中央
+      (5) frame.setLocationRelativeTo(null);  
+         //设置用户在此窗体上发起 "close" 时默认执行的操作。必须指定以下选项之一： 
+         //DO_NOTHING_ON_CLOSE（在 WindowConstants 中定义）：不执行任何操作；要求程序在已注册的 WindowListener 对象的 windowClosing 方法中处理该操作。 
+         //HIDE_ON_CLOSE（在 WindowConstants 中定义）：调用任意已注册的 WindowListener 对象后自动隐藏该窗体。 
+         //DISPOSE_ON_CLOSE（在 WindowConstants 中定义）：调用任意已注册 WindowListener 的对象后自动隐藏并释放该窗体。 
+         //EXIT_ON_CLOSE（在 JFrame 中定义）：使用 System exit 方法退出应用程序。仅在应用程序中使用。 
+      (5) frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	 //显示窗体
+      (6)  frame.setVisible(true);              
+      (7) game.action();
+    
+      Java project -> 右键 -> run java Application ;   运行后可以显示窗体
+
+
+ 02.重写BirdGame类 paint方法,开始进行绘图
+     
+      2.01 声明 开始，运行，结束状态背景图片
+        private int             score = 0;               //游戏分数
+        ..... .... 
+    
+       （1）private BufferedImage background = null ;        //游戏背景图片
+       （2）private BufferedImage gameOverImage = null ;     //游戏结束图片
+       （3）private BufferedImage gameStartImage = null;     //游戏开始图片
+        
+         提问：
+      
+      2.02 初始化图片
+        public BirdGame() throws Exception {
+        ..... ....
+       (1) startImage = ImageIO.read(getClass().getResource("start.png"));           
+       (2) gameOverImage = ImageIO.read(getClass().getResource("gameover.png"));
+       (3) background = ImageIO.read(getClass().getResource("bg.png"));
+        
+      （4）System.out.println(startImage); //直接输出图片 会输出什么？显示图片？ 在read()以后图片还是否还会为空呢？
+      
+     
+     2.03 重写paint方法并绘制背景图片   
+   
+       public void action() throws Exception {....}
+       ..... ....
+
+     /*"重写(修改)"paint方法实现绘制 */
+     （1）public void paint(Graphics g) {
+     （2）	g.drawImage(background, 0, 0, null);    //参数 背景图片,x坐标,y坐标，管理器（用不到设置为null）
+             }
+       Java project -> 右键 -> run java Application ;   显示背景图片
+
+     2.04 paint方法中绘制开始和游戏结束页面
+     
+         public void paint(Graphics g) {
+         ..... ....
+
+           //根据游戏状态进行开始或者结束界面背景
+
+      (1)  switch (state) {
+      (2)	case GAME_OVER:
+      (3)	g.drawImage(gameOverImage, 0, 0, null);
+		break;
+      (4)	case START:
+		g.drawImage(startImage, 0, 0, null);
+		break;
+		}
+     
+         Java project -> 右键 -> run java Application ;   在开始状态显示开始图片显示
+         互动:不用switch语句实现画开始和画结束背景 if语句实现
+
+     2.03 paint方法中绘制所得分数
+          public void paint(Graphics g) {
+          g.drawImage(background, 0, 0, null);                     //参数 背景图片,x坐标,y坐标，管理器（用不到设置为null）
+          ..... ....
+      
+        (1) Font f = new Font(Font.SANS_SERIF, Font.BOLD, 40);    //40号粗体字
+	(2) g.setFont(f);
+	(3) g.drawString("" + score, 40, 60);                     //画String  score    
+         
+        Java project -> 右键 -> run java Application ;             显示分数，此时显示是黑色的分数。
+    
+      2.04 paint方法中绘制所得分数阴影
+          
+          交互：绘制阴影前可以让学生想一想有没有什么方法可以画出阴影
+ 
+          g.drawString("" + score, 40, 60);                     //画String  score 
+          ..... ....
+  
+         （1） g.setColor(Color.WHITE);
+         （2）g.drawString("" + score, 40-3, 60-3);                 //画两个分数错位显示成有阴影的感觉          
+          
+          java project -> 右键 -> run java Application ;           显示分数，此时显示是有阴影的分数。               
+
+  03.创建小鸟类
+
+     3.01 创建小鸟类 声明变量
+          public void paint(Graphics g) {.....}
+          ..... ....
+          
+          /**小鸟类*/
+          public class Bird{
+       
+            (1) public  BufferedImage image = null; //小鸟背景图片
+	    (2) public  int x = 0 ; //小鸟初始化坐标X值
+            (3) public  int y = 0 ; //小鸟初始化坐标Y值
+            (4) public  int width  = 0;
+           （5）public  int height = 0; //小鸟的宽度和高度		 
+		
+           （6）public  int size   = 0; // 鸟的大小，用于碰撞检测	
+		// 定义一组（数组）图片，小鸟的动画帧
+	   （7）BufferedImage[] images;  //创建小鸟图片数组容器
+		// 是动画帧数组元素的下标位置
+	    (8) private int index = 0;    
+
+	    }
+      3.02 Bird类构造方法中变量赋值
+           
+           BufferedImage[] images;  //创建小鸟图片数组容器 
+           private int index = 0;   
+           ..... ....
+ 
+           （0）public Bird() throws Exception {
+			
+	    (1) image = ImageIO.read(getClass().getResource("0.png"));
+	    (2)	width = image.getWidth();
+	    (3)	height = image.getHeight();
+	    (4)	x = 300;
+	   （5）y = 240;   //小鸟初始化x,y坐标 
+	   （6）size = 40; //小鸟尺寸
+		// 创建数组,创建8个元素的数组
+		// 是8个空位置，没有图片对象，
+		// 8个位置的序号: 0 1 2 3 4 5 6 7
+	   （7）images = new BufferedImage[8];
+	   （8）   for (int i = 0; i < 8; i++) {
+		   // i = 0 1 2 3 4 5 6 7
+	   （9）   images[i] = ImageIO.read(getClass().getResource(i + ".png"));
+		      }
+		     index = 0;          
+		   }    
+                }  
+             
+      3.02 在BirdGame类中声明小鸟类对象
+           public class BirdGame extends JPanel {
+           ..... ....
+          (1) private  Bird bird = null;
+
+      3.03 BirdGame构造方法中new对象
+          public BirdGame() throws Exception {
+          ..... ....
+ 
+          (1)  bird = new Bird();
+               
+              互动：可以输出一下小鸟有的属性！
+
+      3.04 BirdGame类 paint方法中 绘制小鸟
+          public void paint(Graphics g) {           
+          ...... ....
+          //Jpanel 画图方法 后画在上 一定要注意 绘制小鸟写在paint方法中
+
+          (1) g.drawImage(bird.image, bird.x - bird.width / 2, bird.y - bird.height
+				/ 2, null);
+          互动：为什么xy坐标要减去宽度和高度的一半呢？
+
+          java project -> 右键 -> run java Application ;           运行显示画出不动的小鸟。  
+      
+      3.05 绘制小鸟飞的方法fly() 并在 action方法的刷新页面循环 START 和 RUNNING 状态中调用
+                      
+          互动：怎么让小鸟飞 
+           
+         public Bird() throws Exception {....}
+         ..... ....
+         
+         //让小鸟飞吧
+       （1）  public void fly() {
+       （2）	 index++;
+		 //第一次不要/12 小鸟像得了羊癫疯似的 ， 加/12后 变慢正常
+       （3）     image = images[(index / 12) % 8];   
+                
+	   } 
+          
+          
+           while (true) {
+			switch (state) {
+			case START:
+	（4）			bird.fly();
+				break;
+			case RUNNING:
+	（5）			bird.fly();                //在开始状态和运行状态调用小鸟fly方法 
+				break;
+			}
+			repaint();                         //刷新 可以讲下this关键字
+			Thread.sleep(1000 / 60);           //可以调试线程睡眠时间 查看小鸟翅膀振动频率
+		}
+          
+        java project -> 右键 -> run java Application ;           运行显示画出会动的小鸟。        
+
+
+ 04.编写地面类Ground 
+     
+     互动：到底是地面动还是背景动！我认为可以找个男生来个错位接吻啥的 活跃下气氛。。。。
+     
+    4.01 创建地面类并初始化数据
+         /** 地面 */
+        
+     （1）class Ground {
+     （2）  public BufferedImage image = null;
+      (3)   public int x = 0 ; 
+      (4)   public int y = 0 ;
+      (5)   public int width = 0;
+      (6)   public int height = 0;
+
+      (7)  public Ground() throws Exception {
+      (8)	image = ImageIO.read(getClass().getResource("ground.png"));   
+      (9)	width = image.getWidth();
+      (10)	height = image.getHeight();
+     （11）	x = 0;
+     （12）	y = 500;
+	     }// 地面的构造器结束
+		
+	 }
+       }// 地面类的结束
+     
+   4.02 在BirdGame类中声明地面类对象，构造方法实例对象
+
+       
+
+
+         (2)   ground= new Ground ();
+
+   4.03 在BirdGame类 paint方法中绘制地面
+        public void paint(){
+        ..... ....
+        //地面写在画柱子的后面 
+       （1）g.drawImage(ground.image, ground.x, ground.y, null);
+   
+   4.04 Ground中添加地面移动方法 step() 并在action 循环刷新中调用
+
+        public Ground() throws Exception {....}
+        ..... ....
+         
+       （1）   public void step() {
+       （2）	x--;
+       （3）	if (x == -109) { //109不是固定的 可以换别的 70多也可以 不过有的数字会给人感觉卡顿
+       （4）		x = 0;
+		}
+      
+            
+             while (true) {
+			switch (state) {
+			case START:
+				bird.fly();
+	（5）			ground.step();  //添加地面移动方法
+				break;
+			case RUNNING:
+				bird.fly();
+	（6）			ground.step();
+				break;
+			}
+			repaint();               //刷新
+			Thread.sleep(1000 / 60);
+		}
+   4.05 编写action方法中 鼠标点击事件    
+       
+         MouseListener l = new MouseAdapter() {
+			// Mouse Pressed按下
+			public void mousePressed(MouseEvent e) {
+				try {
+					switch (state) {
+					
+					case GAME_OVER:
+					       
+						break;
+					case START:
+                         （1）                  state = RUNNING; //开始状态点击 进入游戏运行状态
+						break;
+					case RUNNING:
+    						break;
+					
+					}
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			    }
+		       };  
+
+    java project -> 右键 -> run java Application ;           运行显示地面在动   
+ 
+05.编写柱子类以及移动方法
+       
+
+    5.01 创建柱子类以及初始化数据
+      
+      /** 柱子类型，x,y是柱子的中心点的位置 */
+    (1)  class Column { 
+    (2)	 public BufferedImage image = null;
+    (3)  int x = 0;
+    (4)  int y = 0;
+    (5)	 int width = 0;
+    (6)  int height = 0;
+	/** 柱子中间的缝隙 */
+    (7)  int gap;
+   （8）int distance;// 距离，两个柱子之间的距离
+   （9）Random random = new Random();
+        
+        互动：可以随机输出一个数字，对应学号的同学 讲个笑话？
+       
+	/** 构造器：初始化数据，n代表第几个柱子 */
+    （10）     public Column(int n) throws Exception {
+    （11）	image = ImageIO.read(getClass().getResource("column.png")); // 获取图片资源
+    （12）	width = image.getWidth();
+    （13）	height = image.getHeight();
+    （14）	gap = 144; // 柱子之间的间隙    为啥144 就是这么规定的
+     (15)       distance = 245;  //（两个柱子之间的距离）
+     (16)	x = 550 + (n - 1) * distance;
+     (17)	y = random.nextInt(218) + 132;     //根据上下柱子预留高度  下预留80 上预留50
+	}
+      }
+   
+    
+    5.02 在BirdGame类中声明小鸟类对象，构造方法实例对象
+      
+       public class BirdGame extends JPanel {
+       ..... ....        
+
+      （1）     private  Column  column1;
+      （2）     private  Column  column2;
+
+       public class BirdGame （）{
+       ..... ....  
+
+      （3）     column1 = new Column(1);      
+      （4）     column2 = new Column(2);
+
+     
+     
+    5.03 在BirdGame类 paint方法中绘制柱子
+
+       public Ground() throws Exception {....}
+        ..... ....
+        画柱子要在画地面上面
+
+      (1) g.drawImage(column1.image, column1.x - column1.width / 2, column1.y
+				- column1.height / 2, null);
+      (2) g.drawImage(column2.image, column2.x - column2.width / 2, column2.y
+				- column2.height / 2, null);
+   
+    5.04 中添加地面移动方法 step() 并在action 循环刷新中调用
+         
+         public Column(int n) throws Exception {....}
+         ..... ....
+
+     （1）     public void step() {
+     （2）      x--; //x-=2 
+
+      (3)	if (x == -width / 2) {  //等于-width/2的时候完全消失
+      (4)	   x = distance * 2 - width / 2;
+      (5)	   y = random.nextInt(218) + 132;
+		}
+	}
+            
+          while (true) {
+			switch (state) {
+			case START:
+				bird.fly();
+				ground.step();  
+				break;
+			case RUNNING:
+				bird.fly();
+				ground.step();
+    (6)			        column1.step();     //在运行时 添加柱子移动方法
+    (7)				column2.step();
+				break;
+			}
+			repaint();               //刷新
+			Thread.sleep(1000 / 60);
+		}        
+
+     java project -> 右键 -> run java Application ;           柱子移动  
+06. 完善Bird类和鼠标监听事件 
+   
+   6.00在编写小鸟移动方法前 声明和初始化小鸟一下 物理运动方面的变量
+         public class Bird{...
+         ...... 
+        
+         // 在Bird类中增加属性，用于计算鸟的位置
+	（1）double g = 0;// 重力加速度
+	（2）double t = 0;// 两次位置的间隔时间
+	（3）double v0 =0;// 初始上抛速度
+	（4）double speed = 0;// 是当前的上抛速度
+	（5）double s = 0;// 是经过时间t以后的位移
+	（6）double alpha = 0;// 是鸟的倾角 弧度单位       
+    
+        互动：为什么都是double的而不是int类型的
+
+         public Bird(){
+         ..... ....
+    
+        (7)  g = 4;     //加速度
+	(8)  v0 = 20;   //初始向上的速度
+	(9)  t = 0.25;  //两次位置事件间隔
+	(10) speed = v0; //初始速度等去当前速度 --- 开始时
+	(11) s = 0;      //位移为0
+	(12) alpha = 0;  //角度为0
+
+    6.01 编写Bird类移动方法
+         public void fly(){....}
+         ..... ....
+      
+     （1） public void step(){
+
+     （2） double v0 = speed;
+     （3） s = v0*t-g*t*t/2;   //计算位移
+     （4） y = y-(int)s;       //求出事件0.25以后的y
+     （5） speed = v0-g*t;     //移动后的速度
+     （6） alpha = Math.atan(s/8); //弧度
+             
+     }
+
+    6.02 action刷新中调用
+         
+         public void action(){
+         ..... ....
+ 
+          while (true) {
+			switch (state) {
+			case START:
+				bird.fly();
+				ground.step();  
+				break;
+			case RUNNING:
+				bird.fly();
+         (1)                    bird.step();    //添加小鸟移动方法
+				ground.step();
+				column1.step();     
+				column2.step();
+				break;
+			}
+			repaint();               //刷新
+			Thread.sleep(1000 / 60);
+		}       
+           
+      java project -> 右键 -> run java Application ;          小鸟向下移动   
+    6.03  编写Bird类向上飞方法
+
+          public void step(){....}
+          ..... ....
+        (1)  public void flyUp(){
+
+        (2)  speed = v0;
+         }      
+
+    6.04 完善鼠标点击事件
+         public void action(){
+         ..... ....
+
+         public void mousePressed(MouseEvent e) {
+				
+                       try {
+
+			  switch (state) {
+
+			   case GAME_OVER:
+			   column1 = new Column(1);           //游戏结束状态点击鼠标 初始化 柱子小鸟和分数游戏状态等
+			   column2 = new Column(2);
+			   bird = new Bird();
+			   score = 0;
+			   state = START;
+			   break;
+			   case START:
+			      state = RUNNING;
+			   case RUNNING:
+	(1)			bird.flyUp();     //游戏进行时 点击鼠标调用小鸟向上飞方法
+   				break;
+
+                                } catch (Exception ex) {
+				    ex.printStackTrace();
+				}
+			     }
+
+     java project -> 右键 -> run java Application ;          点击鼠标小鸟向上飞   
+
+     6.05 添加计算分数方法
+      public void action(){
+      ..... ....
+       while (true) {
+			switch (state) {
+			case START:
+				bird.fly();
+				ground.step();
+				break;
+			case RUNNING:
+				column1.step();
+				column2.step();
+				bird.step();// 上下移动
+				bird.fly();// 挥动翅膀
+				ground.step();// 地面移动
+
+				// 新添加的计分逻辑
+	（1）			if (bird.x == column1.x || bird.x == column2.x) {
+					score++;
+				}
+				
+				break;
+			}
+			repaint();
+			Thread.sleep(1000 / 60);
+		}
+
+
+	     };
+
+      java project -> 右键 -> run java Application ;          分数开始计算
+ 
+     6.06 Bird类 添加撞击检测方法
+         
+         public void flyUp(){
+         ..... ....
+
+          // 在鸟中添加方法 hit
+	// 检测当前鸟是否碰到地面ground
+	// 如果返回true表示发送碰撞
+	// 否则返回false表示没有碰撞
+       (1) public boolean hit(Ground ground) {
+       (2)	boolean hit = y + size / 2 > ground.y;
+       (3)	if (hit) {
+       (4)		y = ground.y - size / 2;
+       (5)		alpha = -3.14159265358979323 / 2;
+		}
+       (6)	return hit;
+	}
+
+	// 方法充
+	// 检测当前的鸟是否撞到柱子
+	(7)public boolean hit(Column column) {
+		// 先检测是否在柱子的范围以内
+	(8)	if (x > column.x - column.width / 2 - size / 2
+				&& x < column.x + column.width / 2 + size / 2) {
+	(9)		// 检测是否在缝隙中
+			if (y > column.y - column.gap / 2 + size / 2
+					&& y < column.y + column.gap / 2 - size / 2) {
+	(10)			return false;
+			}
+	(11)		return true;
+		}
+	(12)	return false;
+	}
+
+    6.07 在action 刷新页面中添加撞击检测
+      
+     public void action(){
+     ..... ....
+         
+       while (true) {
+			switch (state) {
+			case START:
+				bird.fly();
+				ground.step();
+				break;
+			case RUNNING:
+				column1.step();
+				column2.step();
+				bird.step();// 上下移动
+				bird.fly();// 挥动翅膀
+				ground.step();// 地面移动
+
+				// 新添加的计分逻辑
+				if (bird.x == column1.x || bird.x == column2.x) {
+					score++;
+				}
+
+				// 如果鸟撞上地面游戏就结束了
+				if (bird.hit(ground) || bird.hit(column1) || bird.hit(column2)
+	(1)					|| bird.hit(food)) {
+					state = GAME_OVER;
+				}
+				
+				break;
+			}
+			repaint();
+			Thread.sleep(1000 / 60);
+		}
+
+
+	     };  
+         java project -> 右键 -> run java Application ;          游戏添加撞击死亡
+         
+     6.07 给小鸟添加旋转角度
+          //角度画在画小鸟的上下即可
+       （1）   Graphics2D g2 = (Graphics2D) g;
+       （2） g2.rotate(-bird.alpha, bird.x, bird.y);
+	  g.drawImage(bird.image, bird.x - bird.width / 2, bird.y - bird.height
+				/ 2, null);
+       （3） g2.rotate(bird.alpha, bird.x, bird.y);
+
+        项目完毕
+
+07.项目注意事项
+   
+    7.01 在paint方法中，后画的会覆盖先画的，所以需要注意绘制顺序 例如：地面应该在柱子上面，所以先画柱子后画地面。
+    7.02 在编写柱子类的时候 注意柱子的y轴大小范围，它是根据柱子上下预留高度做出的范围计算。
+    7.03 程序中有些值是固定的，如果不符可能会引起程序显示和运行效果 例如：柱子的间隙，窗体的大小等。
+
+
+08.项目拓展延伸
+
+   方案一： 可以在窗体中再加入一只小鸟，通过鼠标的左右键分边控制 前后小鸟
+       
+            分析：
+                 从内容上看比较新颖，容易吸引学生兴趣。开发放面看，同学完全可以通过本项目的学习去完成这个需求，有助于学生加强练习。
+   
+   方案二： 可以在项目中加如导弹   
+
+             分析：加入导弹能使项目更多元化，也相对来说更有吸引力，学生也可以通过本项目的学习去完成这个需求。                  
